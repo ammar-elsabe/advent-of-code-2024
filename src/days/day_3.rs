@@ -38,6 +38,52 @@ impl Day3 {
         println!("sum of multiplications: {ret}");
         ret
     }
+
+    fn puzzle_2(input_string: String) -> i32 {
+        let mut search_space = input_string.as_str();
+        let mut ret: i32 = 0;
+        let mut enabled = true;
+        while let Some((opening, substr)) = match search_space.find("mul(") {
+            None => None,
+            Some(opening) => {
+                if enabled {
+                    if search_space[..opening].find("don't()").is_some() {
+                        enabled = false;
+                    }
+                } else {
+                    if search_space[..opening].find("do()").is_some() {
+                        enabled = true;
+                    }
+                }
+                search_space[opening..search_space.len()]
+                    .find(')')
+                    .map(|closing| (opening + 4)..(closing + opening))
+                    .and_then(|range| search_space.get(range))
+                    .map(|substr| (opening, substr))
+            }
+        } {
+            match substr
+                .split(',')
+                .map(|numstr| {
+                    if numstr.len() > 3 || numstr.len() < 1 {
+                        None
+                    } else {
+                        numstr.parse::<i32>().ok()
+                    }
+                })
+                .collect::<Vec<_>>()
+                .as_slice()
+            {
+                [Some(num1), Some(num2)] if enabled => {
+                    ret += num1 * num2;
+                }
+                _ => (),
+            }
+            search_space = &search_space[(opening + 4)..search_space.len()]
+        }
+        println!("sum of multiplications: {ret}");
+        ret
+    }
 }
 
 impl DoPuzzle for Day3 {
@@ -45,7 +91,7 @@ impl DoPuzzle for Day3 {
         let file_contents = Self::read_file(file_name);
         match puzzle {
             Puzzle::Puzzle1 => Self::puzzle_1(file_contents),
-            Puzzle::Puzzle2 => unimplemented!(),
+            Puzzle::Puzzle2 => Self::puzzle_2(file_contents),
         };
     }
 }
@@ -62,5 +108,10 @@ mod tests {
     }
 
     #[test]
-    fn puzzle_2() {}
+    fn puzzle_2() {
+        let actual = Day3::puzzle_2(
+            "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))".to_owned(),
+        );
+        assert_eq!(actual, 48);
+    }
 }
