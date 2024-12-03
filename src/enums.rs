@@ -8,7 +8,7 @@ pub enum Puzzle {
 pub enum Day {
     Day1(Day1),
     Day2(Day2),
-    Day3,
+    Day3(Day3),
     Day4,
     Day5,
     Day6,
@@ -37,7 +37,7 @@ impl TryFrom<i32> for Day {
         match value {
             1 => Ok(Day::Day1(Day1)),
             2 => Ok(Day::Day2(Day2)),
-            3 => Ok(Day::Day3),
+            3 => Ok(Day::Day3(Day3)),
             4 => Ok(Day::Day4),
             5 => Ok(Day::Day5),
             6 => Ok(Day::Day6),
@@ -57,6 +57,7 @@ impl DoPuzzle for Day {
         match self {
             Day::Day1(day1) => day1.do_puzzle(puzzle, file_name),
             Day::Day2(day2) => day2.do_puzzle(puzzle, file_name),
+            Day::Day3(day3) => day3.do_puzzle(puzzle, file_name),
             _ => unimplemented!(),
         }
     }
